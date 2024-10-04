@@ -6,6 +6,12 @@ function getTimeString(time){
    remainingSecond = remainingSecond % 60;
    return`${hour} hour ${minute} minute ${remainingSecond} second ago`;
 }
+const removeActiveClass=()=>{
+    const buttons = document.getElementsByClassName(" category-btn")
+    for (let btn of buttons){
+        btn.classList.remove("active")
+    }
+}  
 
 // 1 - - Fetch, Load and Show Categories on html
 
@@ -29,7 +35,17 @@ const loadCategoryVideos =(id) => {
     // alert(id);
     fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
         .then((res) => res.json())
-        .then((data) => displayVideos(data.category))
+        .then((data) => {
+            // sobaike active class remove korao
+            removeActiveClass();
+
+
+
+        //    id ar class k active koro
+           const activeBtn = document.getElementById(`btn-${id}`) 
+           activeBtn.classList.add("active");
+            displayVideos(data.category);
+        })
         .catch((error) => console.log(error)); 
 
 }
@@ -59,7 +75,27 @@ const loadCategoryVideos =(id) => {
 
 const displayVideos = (videos) => {
     const videoContainer = document.getElementById("videos");
-    videoContainer.innerHTML = "",
+    videoContainer.innerHTML = "";
+     
+
+    if(videos.length ==0 ){
+        videoContainer.classList.remove("grid")
+        videoContainer.innerHTML =`
+        <div class="min-h-[300px] flex flex-col gap-5 w-full justify-center items-center">
+        <img src="assets/Icon.png" />
+        <h2 class="text-center text-xl font-bold">
+         No Content Here in this Categery 
+        </h2>
+          
+  
+        </div>
+        `;
+        return;
+    }
+    else{
+        videoContainer.classList.add("grid")
+    }
+
     videos.forEach((video) => {
         console.log(video);
         const card = document.createElement("div");
@@ -111,7 +147,7 @@ const DisplayCategories = (categories) => {
         // create a button
         const buttonContainer = document.createElement("div");
         buttonContainer.innerHTML=`
-        <button onclick="loadCategoryVideos (${item.category_id})" class="btn">
+        <button id="btn-${item.category_id}" onclick="loadCategoryVideos (${item.category_id})" class="btn category-btn ">
           ${item.category}
         </button>
         `;
